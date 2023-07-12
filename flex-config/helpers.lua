@@ -49,7 +49,7 @@ print('Spatial index type: ' .. gist_type)
 
 -- Best way to change schema name is post-processing.
 -- Use ALTER SCHEMA osm RENAME TO your_schema;
-schema_name = 'osm'
+schema_name = 'public'
 
 
 -- deep_copy based on copy2: https://gist.github.com/tylerneylon/81333721109155b2d244

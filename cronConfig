@@ -1,0 +1,1 @@
+0 1 * * * BASH_ENV=/etc/profile /home/florian/git/pgosm-flex-docker/update_all.sh  >> /home/florian/git/pgosm-flex-docker/updateLog.txt 2>&1

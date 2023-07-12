@@ -233,7 +233,7 @@ def prepare_pgosm_db(skip_qgis_style, db_path, import_mode):
 
 def start_import(pgosm_region, pgosm_date, srid, language, layerset, git_info,
                  osm2pgsql_version, import_mode):
-    """Creates record in osm.pgosm_flex table.
+    """Creates record in public.pgosm_flex table.
 
     Parameters
     ---------------------------
@@ -249,7 +249,7 @@ def start_import(pgosm_region, pgosm_date, srid, language, layerset, git_info,
     Returns
     ----------------------------
     import_id : int
-        Value from the `id` column in `osm.pgosm_flex`.
+        Value from the `id` column in `public.pgosm_flex`.
     """
     params = {'pgosm_region': pgosm_region, 'pgosm_date': pgosm_date,
               'srid': srid, 'language': language, 'layerset': layerset,
@@ -257,7 +257,7 @@ def start_import(pgosm_region, pgosm_date, srid, language, layerset, git_info,
               'import_mode': import_mode.as_json()}
 
     sql_raw = """
-INSERT INTO osm.pgosm_flex
+INSERT INTO public.pgosm_flex
     (osm_date, region, pgosm_flex_version, srid,
         osm2pgsql_version, "language", import_mode,
         layerset)
@@ -486,7 +486,7 @@ def pgosm_nested_admin_polygons(flex_path):
     ----------------------
     flex_path : str
     """
-    sql_raw = 'CALL osm.build_nested_admin_polygons();'
+    sql_raw = 'CALL public.build_nested_admin_polygons();'
 
     conn_string = os.environ['PGOSM_CONN']
     cmds = ['psql', '-d', conn_string, '-c', sql_raw]
@@ -511,7 +511,7 @@ def osm2pgsql_replication_start():
     """
     LOGGER.info('Prep database to allow data updates.')
     # This use of append applies to both osm2pgsql --append and osm2pgsq-replication, not renaming from "append"
-    sql_raw = 'CALL osm.append_data_start();'
+    sql_raw = 'CALL public.append_data_start();'
 
     with get_db_conn(conn_string=connection_string()) as conn:
         cur = conn.cursor()
@@ -528,10 +528,10 @@ def osm2pgsql_replication_finish(skip_nested):
     # Fails via psycopg, using psql
     if skip_nested:
         LOGGER.info('Finishing Replication, skipping nested polygons')
-        sql_raw = 'CALL osm.append_data_finish(skip_nested := True );'
+        sql_raw = 'CALL public.append_data_finish(skip_nested := True );'
     else:
         LOGGER.info('Finishing Replication, including nested polygons')
-        sql_raw = 'CALL osm.append_data_finish(skip_nested := False );'
+        sql_raw = 'CALL public.append_data_finish(skip_nested := False );'
 
     conn_string = os.environ['PGOSM_CONN']
     cmds = ['psql', '-d', conn_string, '-c', sql_raw]
@@ -601,7 +601,7 @@ def fix_pg_dump_create_public(export_path):
 
 
 def log_import_message(import_id, msg):
-    """Logs msg to database in osm.pgosm_flex for import_uuid.
+    """Logs msg to database in public.pgosm_flex for import_uuid.
 
     Parameters
     -------------------------------
@@ -609,7 +609,7 @@ def log_import_message(import_id, msg):
     msg : str
     """
     sql_raw = """
-UPDATE osm.pgosm_flex
+UPDATE public.pgosm_flex
     SET import_status = %(msg)s
     WHERE id = %(import_id)s
 ;
@@ -621,7 +621,7 @@ UPDATE osm.pgosm_flex
 
 
 def get_prior_import() -> dict:
-    """Gets the latest import details from osm.pgosm_flex.
+    """Gets the latest import details from public.pgosm_flex.
 
     Returns
     --------------------
@@ -632,7 +632,7 @@ SELECT id, osm_date, region, layerset, import_status,
         import_mode ->> 'replication' AS replication,
         import_mode ->> 'update' AS use_update,
         import_mode
-    FROM osm.pgosm_flex
+    FROM public.pgosm_flex
     ORDER BY imported DESC
     LIMIT 1
 ;

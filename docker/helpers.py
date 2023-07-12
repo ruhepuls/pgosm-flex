@@ -182,13 +182,13 @@ def get_git_info():
     git_info : str
     """
     logger = logging.getLogger('pgosm-flex')
-    repo = git.Repo()
     try:
+        repo = git.Repo()
         sha = repo.head.object.hexsha
         short_sha = repo.git.rev_parse(sha, short=True)
         latest_tag = repo.git.describe('--abbrev=0', tags=True)
         git_info = f'{latest_tag}-{short_sha}'
-    except ValueError:
+    except:
         git_info = 'Git info unavailable'
         logger.error('Unable to get git information.')
 

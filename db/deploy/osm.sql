@@ -8,4 +8,4 @@
 */
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE SCHEMA IF NOT EXISTS osm;
-COMMENT ON SCHEMA osm IS 'Schema populated by PgOSM Flex.  SELECT * FROM osm.pgosm_flex; for details.';
+COMMENT ON SCHEMA osm IS 'Schema populated by PgOSM Flex.  SELECT * FROM public.pgosm_flex; for details.';
